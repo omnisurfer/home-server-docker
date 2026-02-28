@@ -1,1 +1,8 @@
 .env
+
+mysql/
+redis/
+data/
+backup/
+
+deprecated/
