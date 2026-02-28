@@ -1,7 +1,44 @@
+###
 Traefik:
 
 https://owncloud.org/news/docker-owncloud-traefik-reverse-proxy-lets-encrypt-ssl/
 
+https://owncloud.org/news/docker-owncloud-traefik-reverse-proxy-lets-encrypt-ssl/
+
+https://owncloud.com/news/docker-series-pt-2-set-up-owncloud-traefik-as-a-reverse-proxy-with-lets-encrypt-ssl/
+
+https://doc.traefik.io/traefik/getting-started/quick-start/
+
+
+###
 Owncloud Docker Image:
 
 https://hub.docker.com/_/owncloud
+
+
+###
+To move an existing docker data folder, do the following:
+https://stackoverflow.com/questions/59345566/move-docker-volume-to-different-partition
+
+1) Stop the docker daemon:
+
+service docker stop
+
+2) Create/Edit the /etc/docker/daemon.json configuration file with location of the new data directory:
+
+{
+    "data-root": "/new/path"
+}
+
+3) Copy docker files to new location:
+
+rsync -aP /var/lib/docker/ /new/path
+
+4) Remove old directory (rename it to be safe)
+
+mv /var/lib/docker /var/lib/docker.old
+
+
+###
+Spin down external hard drives:
+https://hd-idle.sourceforge.net/

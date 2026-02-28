@@ -1,7 +1,5 @@
 #Notes:
-# https://owncloud.org/news/docker-owncloud-traefik-reverse-proxy-lets-encrypt-ssl/
-# https://owncloud.com/news/docker-series-pt-2-set-up-owncloud-traefik-as-a-reverse-proxy-with-lets-encrypt-ssl/
-# https://doc.traefik.io/traefik/getting-started/quick-start/
+# Look into using self signed cert OR Let's Encrypt with DNS API Access?
 
 services:
   traefik-reverse-proxy:
@@ -14,16 +12,26 @@ services:
       - "--api.insecure=true"           # DEV USE ONLY
       - "--providers.docker=true"             
       - "--entrypoints.web.address=:80"
+      # DEBUG
+      - "--entrypoints.websecure.address=:443"
+    
     ports:
       - "80:80"
+      - "443:443"
       - "8080:8080"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "${HOST_TRAEFIK_PATH}/acme.json:/acme.json"      
 
   # debug Whoami
   whoami:
     image: traefik/whoami
     labels:      
-      - "traefik.http.routers.whoami.rule=Host(`whoami.localhost`)"
+      - "traefik.http.routers.whoami-web.rule=Host(`whoami.localhost`)"      
+      - "traefik.http.routers.app.tls=true"
+      # DEBUG
+      - "traefik.http.routers.whoami-web.entrypoints=web"
+      - "traefik.http.routers.whoami-websecure.rule=Host(`whoami.localhost`)"
+      - "traefik.http.routers.whoami-websecure.entrypoints=websecure"
     networks:
       - traefik-network
