@@ -45,7 +45,7 @@ services:
       - traefik-network
       - internal
     volumes:    
-      - "${HOST_OWNCLOUD_DATA_PATH}:/var/lib/data"
+      - "${HOST_OWNCLOUD_DATA_PATH}:/mnt/data"
 
   db:
     image: webhippie/mariadb:latest
