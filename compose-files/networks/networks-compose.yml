@@ -1,0 +1,7 @@
+# NOTE: If network 'traefik-network' is not present, run the below command to make it
+# docker network create traefik-network
+
+networks:
+  traefik-network:
+    external: true
+  internal:

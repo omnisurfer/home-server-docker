@@ -1,0 +1,29 @@
+#Notes:
+# https://owncloud.org/news/docker-owncloud-traefik-reverse-proxy-lets-encrypt-ssl/
+# https://owncloud.com/news/docker-series-pt-2-set-up-owncloud-traefik-as-a-reverse-proxy-with-lets-encrypt-ssl/
+# https://doc.traefik.io/traefik/getting-started/quick-start/
+
+services:
+  traefik-reverse-proxy:
+    image: traefik:latest
+    restart: unless-stopped
+    networks:
+      - traefik-network
+      - internal
+    command:      
+      - "--api.insecure=true"           # DEV USE ONLY
+      - "--providers.docker=true"             
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+  # debug Whoami
+  whoami:
+    image: traefik/whoami
+    labels:      
+      - "traefik.http.routers.whoami.rule=Host(`whoami.localhost`)"
+    networks:
+      - traefik-network

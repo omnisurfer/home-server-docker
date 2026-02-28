@@ -1,0 +1,4 @@
+include:
+  - networks/networks-compose.yml
+  - traefik/traefik-compose.yml
+  - owncloud/owncloud-compose.yml
