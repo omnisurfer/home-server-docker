@@ -1,4 +1,6 @@
 include:
   - networks/networks-compose.yml
   - traefik/traefik-compose.yml
+  - whoami/whoami-compose.yml
+  # - openstreetmap/openstreetmap-compose.yml
   - owncloud/owncloud-compose.yml

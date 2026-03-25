@@ -1,0 +1,12 @@
+entryPoints:
+  web:
+    address: ":80"
+  websecure:
+    address: ":443"
+
+api:
+  dashboard: true   # reachable at http://<host>:8080/dashboard/
+
+providers:
+  docker:
+    exposedByDefault: false   # we only expose services that have traefik.enable=true labels

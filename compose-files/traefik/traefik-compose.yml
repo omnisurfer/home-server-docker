@@ -4,34 +4,44 @@
 services:
   traefik-reverse-proxy:
     image: traefik:latest
+    ports:
+      - 80:80
+      - 443:443     # public web traffic
+      - 8080:8080   # Traefik dashboard (optional)
     restart: unless-stopped
     networks:
       - traefik-network
-      - internal
-    command:      
-      - "--api.insecure=true"           # DEV USE ONLY
-      - "--providers.docker=true"             
-      - "--entrypoints.web.address=:80"
-      # DEBUG
-      - "--entrypoints.websecure.address=:443"
-    
-    ports:
-      - "80:80"
-      - "443:443"
-      - "8080:8080"
+      - internal    # for Owncloud
+      - proxy      
+    command:
+      - --api.dashboard=true
+      - --api.insecure=true           # <-- dev‑only dashboard on :8080 (remove in prod)
+      - --log.level=DEBUG
+      #- --log.filepath=/var/log/traefik.log
+      - --accesslog=true
+      #- --accesslog.filepath=/var/log/traefik-access.log
+      - --providers.docker.network=proxy
+      - --providers.docker.exposedByDefault=false
+      - --entrypoints.web.address=:80
+      - --entrypoints.web.http.redirections.entrypoint.to=websecure
+      - --entryPoints.web.http.redirections.entrypoint.scheme=https
+      - --entrypoints.websecure.address=:443
+      - --entrypoints.websecure.asDefault=true 
+      - --entrypoints.websecure.http.tls.certresolver=myresolver
+      - --certificatesresolvers.myresolver.acme.tlschallenge=true
+      - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.mydashboard.rule=Host(`traefik.${SERVER_DOMAIN}`)
+      - traefik.http.routers.mydashboard.service=api@internal
+      - traefik.http.routers.mydashboard.middlewares=myauth
+      - traefik.http.middlewares.myauth.basicauth.users=test:$$apr1$$H6uskkkW$$IgXLP6ewTrSuBkTrqE8wj/ # CHANGE IN ACTUAL DEPLOYMENT
+        
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "${HOST_TRAEFIK_PATH}/acme.json:/acme.json"      
+      # - "${HOST_TRAEFIK_PATH}/traefik.yml:/etc/traefik/traefik.yml:ro"
+      # - "${HOST_TRAEFIK_PATH}/letsencrypt:/letsencrypt" # for lets Encrypt
+      # - "${HOST_TRAEFIK_PATH}/certs:/etc/traefik/certs:ro"
 
-  # debug Whoami
-  whoami:
-    image: traefik/whoami
-    labels:      
-      - "traefik.http.routers.whoami-web.rule=Host(`whoami.localhost`)"      
-      - "traefik.http.routers.app.tls=true"
-      # DEBUG
-      - "traefik.http.routers.whoami-web.entrypoints=web"
-      - "traefik.http.routers.whoami-websecure.rule=Host(`whoami.localhost`)"
-      - "traefik.http.routers.whoami-websecure.entrypoints=websecure"
-    networks:
-      - traefik-network
+
+

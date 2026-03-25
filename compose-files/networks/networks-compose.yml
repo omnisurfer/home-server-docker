@@ -2,6 +2,8 @@
 # docker network create traefik-network
 
 networks:
+  proxy:
+    name: proxy
   traefik-network:
-    external: true
+    external: true  
   internal:
